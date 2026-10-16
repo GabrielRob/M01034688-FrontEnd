@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>M01034688</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+</head>
+<body>
+  <div id="app">
+    <h1>{{ title }}</h1>
+    <p>Backend status: {{ status }}</p>
+  </div>
+
+  <script>
+    Vue.createApp({
+      data() {
+        return { title: 'M01034688', status: 'checking...' };
+      },
+      async mounted() {
+        try {
+          const res = await fetch('http://localhost:3000/api/health');
+          const data = await res.json();
+          this.status = data.status + ' (db ' + data.db + ')';
+        } catch (e) {
+          this.status = 'unreachable';
+        }
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
