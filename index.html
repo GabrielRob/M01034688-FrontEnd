@@ -9,20 +9,66 @@
 </head>
 <body>
   <div id="app">
-    <h1>{{ title }}</h1>
-    <p>Backend status: {{ status }}</p>
+    <header>
+      <h1>Find your next lesson</h1>
+      <p class="sub">Browse our after-school classes and pick one that suits you.</p>
+      <input v-model="query" @input="search" placeholder="Try &quot;Math&quot; or &quot;London&quot;…">
+      <p class="status" :class="{ down: status === 'unreachable' }">
+        {{ status === 'unreachable' ? "We can't reach the server right now." : '' }}
+      </p>
+    </header>
+    <p class="empty" v-if="loaded && lessons.length === 0">No lessons match your search.</p>
+    <ul class="lessons">
+      <li class="card" v-for="l in lessons" :key="l._id">
+        <h3>{{ l.subject }}</h3>
+        <p class="where">{{ l.location }}</p>
+        <p class="meta">
+          <span class="price">£{{ l.price }}</span>
+          <span :class="{ few: l.spaces <= 2 }">
+            {{ l.spaces === 0 ? 'Fully booked' : l.spaces === 1 ? 'Only 1 space left' : l.spaces + ' spaces left' }}
+          </span>
+        </p>
+      </li>
+    </ul>
   </div>
 
   <script>
+    const API = 'http://localhost:3000/api';
+
     Vue.createApp({
       data() {
-        return { title: 'M01034688', status: 'checking...' };
+        return { title: 'M01034688', status: 'checking...', lessons: [], query: '', loaded: false };
+      },
+      methods: {
+        async search() {
+          const res = await fetch(`${API}/search?q=${encodeURIComponent(this.query)}`);
+          this.lessons = await res.json();
+        },
+        async placeOrder(name, phone, lessonIDs) {
+          const res = await fetch(`${API}/orders`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, phone, lessonIDs })
+          });
+          return res.json();
+        },
+        async updateLesson(id, fields) {
+          const res = await fetch(`${API}/lessons/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(fields)
+          });
+          return res.json();
+        }
       },
       async mounted() {
         try {
-          const res = await fetch('http://localhost:3000/api/health');
+          const res = await fetch(`${API}/health`);
           const data = await res.json();
           this.status = data.status + ' (db ' + data.db + ')';
+          const lessons = await fetch(`${API}/lessons`);
+          this.lessons = await lessons.json();
+          this.loaded = true;
         } catch (e) {
           this.status = 'unreachable';
         }
