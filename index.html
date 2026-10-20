@@ -1,79 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>M01034688</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-</head>
-<body>
-  <div id="app">
-    <header>
-      <h1>Find your next lesson</h1>
-      <p class="sub">Browse our after-school classes and pick one that suits you.</p>
-      <input v-model="query" @input="search" placeholder="Try &quot;Math&quot; or &quot;London&quot;…">
-      <p class="status" :class="{ down: status === 'unreachable' }">
-        {{ status === 'unreachable' ? "We can't reach the server right now." : '' }}
-      </p>
-    </header>
-    <p class="empty" v-if="loaded && lessons.length === 0">No lessons match your search.</p>
-    <ul class="lessons">
-      <li class="card" v-for="l in lessons" :key="l._id">
-        <h3>{{ l.subject }}</h3>
-        <p class="where">{{ l.location }}</p>
-        <p class="meta">
-          <span class="price">£{{ l.price }}</span>
-          <span :class="{ few: l.spaces <= 2 }">
-            {{ l.spaces === 0 ? 'Fully booked' : l.spaces === 1 ? 'Only 1 space left' : l.spaces + ' spaces left' }}
-          </span>
-        </p>
-      </li>
-    </ul>
-  </div>
-
-  <script>
-    const API = 'http://localhost:3000/api';
-
-    Vue.createApp({
+   <!DOCTYPE html>
+   <html>
+   <head>
+     <meta charset="UTF-8">
+     <title>After School Classes</title>
+     <script src="https://unpkg.com/vue@3.4.38/dist/vue.global.js"></script>
+   </head>
+   <body>
+     <div id="app">
+       <h1>{{ sitename }}</h1>
+     </div>
+     <script type="module">
+      const { createApp } = Vue
+      const webstore = createApp({
       data() {
-        return { title: 'M01034688', status: 'checking...', lessons: [], query: '', loaded: false };
-      },
-      methods: {
-        async search() {
-          const res = await fetch(`${API}/search?q=${encodeURIComponent(this.query)}`);
-          this.lessons = await res.json();
-        },
-        async placeOrder(name, phone, lessonIDs) {
-          const res = await fetch(`${API}/orders`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, phone, lessonIDs })
-          });
-          return res.json();
-        },
-        async updateLesson(id, fields) {
-          const res = await fetch(`${API}/lessons/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(fields)
-          });
-          return res.json();
-        }
-      },
-      async mounted() {
-        try {
-          const res = await fetch(`${API}/health`);
-          const data = await res.json();
-          this.status = data.status + ' (db ' + data.db + ')';
-          const lessons = await fetch(`${API}/lessons`);
-          this.lessons = await lessons.json();
-          this.loaded = true;
-        } catch (e) {
-          this.status = 'unreachable';
-        }
+      return {
+      sitename: "After School Activities"
       }
-    }).mount('#app');
-  </script>
-</body>
-</html>
+    }
+  })
+  webstore.mount('#app')
+</script>
+   </body>
+   </html>
