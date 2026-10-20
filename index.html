@@ -8,16 +8,36 @@
    <body>
      <div id="app">
        <h1>{{ sitename }}</h1>
+     <div v-for="lesson in lessons" :key="lesson.id">
+       <span :class="'fa ' + lesson.icon"></span>
+       <h2>{{ lesson.subject }}</h2>
+       <p>Location: {{ lesson.location }}</p>
+       <p>Price: ${{ lesson.price }}</p>
+       <p>Space: {{ lesson.space }}</p>
+     </div>
      </div>
      <script type="module">
       const { createApp } = Vue
       const webstore = createApp({
       data() {
       return {
-      sitename: "After School Activities"
-      }
+      sitename: "Tutoring lessons",
+      lessons: [
+        {id: 1, subject: "Math", location: "London", price: 100, space: 9, icon: "fa-calculator"},
+        {id: 2, subject: "Science", location: "New York", price: 120, space: 5, icon: "fa-flask"},
+        {id: 3, subject: "English", location: "Paris", price: 90, space: 8, icon: "fa-book"},
+        {id: 4, subject: "History", location: "Berlin", price: 110, space: 6, icon: "fa-landmark"},
+        {id: 5, subject: "Art", location: "Rome", price: 95, space: 7, icon: "fa-paint-brush"},
+        {id: 6, subject: "Music", location: "Vienna", price: 105, space: 4, icon: "fa-music"},
+        {id: 7, subject: "Physical Education", location: "Sydney", price: 85, space: 10, icon: "fa-basketball"},
+        {id: 8, subject: "Computer Science", location: "Tokyo", price: 130, space: 3, icon: "fa-laptop-code"},
+        {id: 9, subject: "Drama", location: "Los Angeles", price: 115, space: 6, icon: "fa-theater-masks"},
+        {id: 10, subject: "Economics", location: "London", price: 120, space: 5, icon: "fa-chart-line"},
+        {id: 11, subject: "Philosophy", location: "Athens", price: 100, space: 5, icon: "fa-brain"}
+      ]
     }
-  })
+  }
+})
   webstore.mount('#app')
 </script>
    </body>
