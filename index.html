@@ -9,26 +9,38 @@
    <body>
      <div id="app">
        <h1>{{ sitename }}</h1>
-      <label>Sort by:
-        <select v-model="sortBy">
-          <option value="subject">subject</option>
-          <option value="location">Location</option>
-          <option value="price">Price</option>
-          <option value="space">Space</option>
-        </select>
-      </label>
-      <label><input type="radio" value="asc" v-model="sortOrder"> Ascending</label>
-      <label><input type="radio" value="desc" v-model="sortOrder"> Descending</label>
-     <div v-for="lesson in sortedLessons" :key="lesson.id">
-       <span :class="'fa ' + lesson.icon"></span>
-       <h2>{{ lesson.subject }}</h2>
-       <p>Location: {{ lesson.location }}</p>
-       <p>Price: ${{ lesson.price }}</p>
-       <p>Space: {{ lesson.space }}</p>
-       <button v-on:click="addToCart(lesson)" :disabled="lesson.space === 0">
-        Buy
-       </button>
-     </div>
+        <button v-on:click="showCart = !showCart" :disabled="cart.length === 0">
+          <span class="fa-solid fa-cart-shopping"></span> Cart ({{ cart.length }})
+        </button>
+        <div v-if="!showCart">
+          <label>Sort by:
+            <select v-model="sortBy">
+              <option value="subject">subject</option>
+              <option value="location">Location</option>
+              <option value="price">Price</option>
+              <option value="space">Space</option>
+            </select>
+          </label>
+          <label><input type="radio" value="asc" v-model="sortOrder"> Ascending</label>
+          <label><input type="radio" value="desc" v-model="sortOrder"> Descending</label>
+          <div v-for="lesson in sortedLessons" :key="lesson.id">
+            <span :class="'fa ' + lesson.icon"></span>
+            <h2>{{ lesson.subject }}</h2>
+            <p>Location: {{ lesson.location }}</p>
+            <p>Price: ${{ lesson.price }}</p>
+            <p>Space: {{ lesson.space }}</p>
+            <button v-on:click="addToCart(lesson)" :disabled="lesson.space === 0">
+              Buy
+            </button>
+          </div>
+        </div>
+        <div v-else>
+          <h2>Shopping Cart</h2>
+          <div v-for="(id, index) in cart" :key="index">
+            <p>{{ getLessons(id).subject }}, {{ getLessons(id).location }}, £{{ getLessons(id).price }}</p>
+            <button v-on:click="removeFromCart(index)">Remove</button>
+          </div>
+        </div>
      </div>
      <script type="module">
       const { createApp } = Vue
@@ -36,6 +48,7 @@
       data() {
       return {
       sitename: "Tutoring lessons",
+      showCart: false,
       lessons: [
         {id: 1, subject: "Math", location: "London", price: 100, space: 5, icon: "fa-calculator"},
         {id: 2, subject: "Science", location: "New York", price: 120, space: 5, icon: "fa-flask"},
@@ -72,6 +85,15 @@
         addToCart(lesson) {
           this.cart.push(lesson.id)
           lesson.space--
+        },
+        getLessons(id){
+          return this.lessons.find(leson => leson.id === id)
+        },
+        removeFromCart(index) {
+          const lesson = this.getLessons(this.cart[index])
+          lesson.space++
+          this.cart.splice(index, 1)
+          if (this.cart.length === 0) this.showCart = false
         }
       }
 })
