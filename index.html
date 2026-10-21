@@ -40,6 +40,12 @@
             <p>{{ getLessons(id).subject }}, {{ getLessons(id).location }}, £{{ getLessons(id).price }}</p>
             <button v-on:click="removeFromCart(index)">Remove</button>
           </div>
+          <h3>Checkout</h3>
+            <label>Name: <input type="text" v-model="name"></label>
+            <label>Phone: <input type="text" v-model="phone"></label>
+            <button v-on:click="checkout" :disabled="!canCheckout">Checkout</button>
+            <p v-if="orderMessage">{{orderMessage}}</p>
+
         </div>
      </div>
      <script type="module">
@@ -49,6 +55,9 @@
       return {
       sitename: "Tutoring lessons",
       showCart: false,
+      name:"",
+      phone:"",
+      orderMessage:"",
       lessons: [
         {id: 1, subject: "Math", location: "London", price: 100, space: 5, icon: "fa-calculator"},
         {id: 2, subject: "Science", location: "New York", price: 120, space: 5, icon: "fa-flask"},
@@ -73,12 +82,17 @@
             let x = a[this.sortBy]
             let y = b[this.sortBy]
             if (typeof x === "string") {
-              x = x.toLowerCase(); 
+              x = x.toLowerCase()
               y = y.toLowerCase()
             }
             let result = x > y ? 1 : x < y ? -1 : 0
             return this.sortOrder === "asc" ? result : -result
           })
+        },
+        canCheckout(){
+          const nameOK = /^[A-Za-z ]+$/.test(this.name)
+          const phneOK = /^[0-9]+$/.test(this.phone)
+          return nameOK && phneOK
         }
       },
       methods: {
@@ -94,6 +108,12 @@
           lesson.space++
           this.cart.splice(index, 1)
           if (this.cart.length === 0) this.showCart = false
+        },
+        checkout() {
+          this.orderMessage = "Thank you " + this.name + ", your order has been submitted"
+          this.cart = []
+          this.name=""
+          this.phone=""
         }
       }
 })
